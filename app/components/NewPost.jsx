@@ -106,6 +106,28 @@ var NewPost = React.createClass({
     });
   },
 
+  handleUpload: function(event) {
+    console.log('do an upload...');
+  },
+
+  handleDragLeave: function(event) {
+    this.setState({
+      catchFiles: false
+    });
+  },
+
+  handleDragOver: function(event) {
+    this.setState({
+      catchFiles: true
+    });
+  },
+
+  handleDrop: function(event) {
+    this.setState({
+      catchFiles: false
+    });
+  },
+
   renderBody: function() {
     if (!this.props.inline || !this.state.inline) {
       return (
@@ -129,7 +151,10 @@ var NewPost = React.createClass({
 
     return (
       <div
-        style={{display: 'flex'}}
+        style={{
+          display: 'flex',
+          position: 'relative'
+        }}
       >
         <Input
           className="v-Atom"
@@ -140,6 +165,16 @@ var NewPost = React.createClass({
           onChange={this.handleChange}
           value={this.state.body}
           disabled={this.state && this.state.restrictSubmit}
+        />
+        <input
+          type='file'
+          ref='fileInput'
+          onChange={this.handleUpload}
+          onDragLeave={this.handleDragLeave}
+          onDragOver={this.handleDragOver}
+          onDrop={this.handleDrop}
+          multiple
+          style={this.renderDropOrNot()}
         />
         <button
           ref="button"
@@ -161,6 +196,32 @@ var NewPost = React.createClass({
         </button>
       </div>
     );
+  },
+
+  renderDropOrNot: function() {
+    if (this.state.catchFiles) {
+      return {
+        position: 'fixed',
+        opacity: 0,
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+        width: '100%',
+        height: '100%'
+      };
+    }
+
+    return {
+      position: 'absolute',
+      opacity: 0,
+      width: '100%',
+      height: '100%'
+    };
+  },
+
+  componentDidMount: function() {
+    document.addEventListener('dragover', this.handleDragOver);
   },
 
   componentWillReceiveProps: function(nextProps) {
